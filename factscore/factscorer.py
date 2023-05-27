@@ -150,7 +150,7 @@ class FactScorer(object):
         return {"score": np.mean(scores),
                 "respond_ratio": respond_ratio,
                 "decisions": decisions,
-                "num_facts_per_response": np.mean([len(d) for d in decisions])}
+                "num_facts_per_response": np.mean([len(d) if d is not None else 0 for d in decisions])}
 
     def _get_score(self, topic, generation, atomic_facts, knowledge_source):
         decisions = []
