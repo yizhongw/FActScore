@@ -19,7 +19,7 @@ class FactScorer(object):
                  data_dir=".cache/factscore",
                  model_dir=".cache/factscore",
                  cache_dir=".cache/factscore",
-                 openai_key="api.key",
+                 openai_key=None,
                  batch_size=256):
         assert model_name in ["retrieval+llama", "retrieval+llama+npm", "retrieval+ChatGPT", "npm", "retrieval+ChatGPT+npm"]
         self.model_name = model_name
@@ -44,7 +44,7 @@ class FactScorer(object):
         elif "ChatGPT" in model_name:
             self.lm = OpenAIModel("ChatGPT",
                                   cache_file=os.path.join(cache_dir, "ChatGPT.pkl"),
-                                  key_path=openai_key)
+                                  api_key=self.openai_key)
         else:
             self.lm = None
 
@@ -104,9 +104,11 @@ class FactScorer(object):
             assert len(topics)==len(atomic_facts), "`topics` and `atomic_facts` should have the same length"
         else:
             if self.af_generator is None:
-                self.af_generator = AtomicFactGenerator(key_path=self.openai_key,
-                                                        demon_dir=os.path.join(self.data_dir, "demos"),
-                                                        gpt3_cache_file=os.path.join(self.cache_dir, "InstructGPT.pkl"))
+                self.af_generator = AtomicFactGenerator(
+                    demon_dir=os.path.join(self.data_dir, "demos"),
+                    openai_api_key=self.openai_key,
+                    gpt3_cache_file=os.path.join(self.cache_dir, "InstructGPT.pkl")
+                )
 
             if verbose:
                 topics = tqdm(topics)
@@ -208,7 +210,7 @@ if __name__ == '__main__':
                         default="retrieval+ChatGPT")
     parser.add_argument('--openai_key',
                         type=str,
-                        default="api.key")
+                        help="OpenAI API key for calling openai engines. If not specified, the environment variable `OPENAI_API_KEY` will be used.",)
     parser.add_argument('--data_dir',
                         type=str,
                         default=".cache/factscore/")
