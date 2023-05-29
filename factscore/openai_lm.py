@@ -64,7 +64,7 @@ def call_ChatGPT(message, model_name="gpt-3.5-turbo", max_len=1024, temp=0.7, ve
                 assert False
             
             logging.error("API error: %s (%d). Waiting %dsec" % (error, num_rate_errors, np.power(2, num_rate_errors)))
-            time.sleep(np.power(2, num_rate_errors))
+            time.sleep(min(np.power(2, num_rate_errors), 3600))
     return response
 
 
@@ -90,5 +90,5 @@ def call_GPT3(prompt, model_name="text-davinci-003", max_len=512, temp=0.7, num_
                 logging.critical(f"InvalidRequestError\nPrompt passed in:\n\n{prompt}\n\n")
                 assert False
             logging.error("API error: %s (%d)" % (error, num_rate_errors))
-            time.sleep(np.power(2, num_rate_errors))
+            time.sleep(min(np.power(2, num_rate_errors), 3600))
     return response
